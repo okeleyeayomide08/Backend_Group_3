@@ -1,62 +1,87 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import swaggerUi from 'swagger-ui-express';
-import { specs } from './config/swagger.js';
-import { connectDB } from './config/database.js';
-import authRoutes from './routes/authRoutes.js';
-import externalApiRoutes from './routes/externalApiRoutes.js';
-import errorHandler from './middleware/errorHandler.js';
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import swaggerUi from "swagger-ui-express";
+import { specs } from "./config/swagger.js";
+import { connectDB } from "./config/db.js";
+import authRoutes from "./routes/authRoutes.js";
+import errorHandler from "./middleware/errorHandler.js";
 
-// Load environment variables
 dotenv.config();
 
-// Create Express app
 const app = express();
 
-// Middleware
-app.use(cors());
+// ─── Security Middleware ───────────────────────────────
+app.use(helmet());
+
+// ─── CORS Configuration ────────────────────────────────
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS?.split(",") || "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
+// ─── Request Logging ───────────────────────────────────
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// ─── Body Parsers ──────────────────────────────────────
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static('uploads'));
+// ─── Swagger Documentation ─────────────────────────────
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, { explorer: true }),
+);
 
-// Swagger Documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, { explorer: true }));
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/external', externalApiRoutes);
-
-// Error handling
-app.use(errorHandler);
-
-// Handle 404
-app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'Route not found'
+// ─── Health Check ──────────────────────────────────────
+app.get("/", (req, res) => {
+  res.json({
+    status: "success",
+    message: "StockPilot API is running 🚀",
+    version: "1.0.0",
+    docs: `http://localhost:${process.env.PORT}/api-docs`,
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 3001;
+// ─── Routes ────────────────────────────────────────────
+app.use("/api/auth", authRoutes);
+// More routes will be added here as we build them
+
+// ─── Handle Undefined Routes (404) ────────────────────
+app.use((req, res) => {
+  res.status(404).json({
+    status: "error",
+    message: `Route ${req.originalUrl} not found`,
+  });
+});
+
+// ─── Global Error Handler (must be last) ──────────────
+app.use(errorHandler);
+
+// ─── Start Server ──────────────────────────────────────
+const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
   try {
-    // Connect to database
     await connectDB();
-
-    // Start listening
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Swagger documentation available at http://localhost:${PORT}/api-docs`);
+      console.log(`🚀 StockPilot server running on port ${PORT}`);
+      console.log(`📚 API Docs → http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error("❌ Failed to start server:", error);
     process.exit(1);
   }
 };
 
 startServer();
+
+export default app;
