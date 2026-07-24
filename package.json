@@ -1,7 +1,7 @@
 {
-  "name": "stockpilot-backend",
+  "name": "inventory-backend",
   "version": "1.0.0",
-  "description": "StockPilot - Inventory Management System for SMEs",
+  "description": "Inventory - Inventory Management System for SMEs",
   "type": "module",
   "main": "src/app.js",
   "scripts": {

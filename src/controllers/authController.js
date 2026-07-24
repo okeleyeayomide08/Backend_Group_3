@@ -1,36 +1,48 @@
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import User from '../models/User.js';
-import { sendResetPasswordEmail } from '../services/emailService.js';
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { Op } from "sequelize";
+import User from "../models/User.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
+import {
+  sendResetPasswordEmail,
+  sendEmployeeCredentialsEmail,
+} from "../services/emailService.js";
+import { validationResult } from "express-validator";
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRATION
+    expiresIn: process.env.JWT_EXPIRATION,
   });
 };
 
 export const register = async (req, res, next) => {
   try {
-    const { username, email, password, role } = req.body;
+    // check validation errors first
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return errorResponse(res, errors.array()[0].msg, 400);
+    }
 
-    // Create user
-    const user = await User.create({
-      username,
-      email,
-      password,
-      role: role || 'user' // Default to 'user' if no role specified
-    });
+    const { fullName, email, password } = req.body;
 
-    // Generate token
+    // check if email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return errorResponse(res, "Email already exists", 400);
+    }
+
+    // create user
+    const user = await User.create({ fullName, email, password });
+
+    // generate token
     const token = generateToken(user.id);
 
-    res.status(201).json({
-      status: 'success',
-      data: {
-        user,
-        token
-      }
-    });
+    return successResponse(
+      res,
+      "Registration successful",
+      { user, token },
+      201,
+    );
   } catch (error) {
     next(error);
   }
@@ -38,24 +50,28 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-
-    // Check if email and password exist
-    if (!email || !password) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Please provide email and password'
-      });
+    // check validation errors first
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return errorResponse(res, errors.array()[0].msg, 400);
     }
+
+    const { email, password } = req.body;
 
     // Find user
     const user = await User.findOne({ where: { email } });
 
     if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Incorrect email or password'
-      });
+      return errorResponse(res, "Incorrect email or password", 401);
+    }
+
+    // Check if user is Active
+    if (!user.isActive) {
+      return errorResponse(
+        res,
+        "Your account has been deactivated. Contact support.",
+        403,
+      );
     }
 
     // Update last login
@@ -65,13 +81,43 @@ export const login = async (req, res, next) => {
     // Generate token
     const token = generateToken(user.id);
 
-    res.json({
-      status: 'success',
-      data: {
-        user,
-        token
-      }
+    return successResponse(res, "Login Successful", {
+      user,
+      token,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createEmployee = async (req, res, next) => {
+  try {
+    // check validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return errorResponse(res, errors.array()[0].msg, 400);
+    }
+
+    const { fullName, email, password, role } = req.body;
+
+    // check if email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return errorResponse(res, "Email already exists", 400);
+    }
+
+    // create employee
+    const employee = await User.create({ fullName, email, password, role });
+
+    // send email with credentials
+    await sendEmployeeCredentialsEmail(email, fullName, password, role);
+
+    return successResponse(
+      res,
+      "Employee created successfully",
+      { employee },
+      201,
+    );
   } catch (error) {
     next(error);
   }
@@ -79,22 +125,25 @@ export const login = async (req, res, next) => {
 
 export const forgotPassword = async (req, res, next) => {
   try {
+    // check validation errors first
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return errorResponse(res, errors.array()[0].msg, 400);
+    }
+
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: 'No user found with that email'
-      });
+      return errorResponse(res, "No user found with that email", 404);
     }
 
     // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetToken = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = crypto
-      .createHash('sha256')
+      .createHash("sha256")
       .update(resetToken)
-      .digest('hex');
+      .digest("hex");
     user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
     await user.save();
@@ -102,19 +151,17 @@ export const forgotPassword = async (req, res, next) => {
     try {
       await sendResetPasswordEmail(user.email, resetToken);
 
-      res.json({
-        status: 'success',
-        message: 'Reset token sent to email'
-      });
+      return successResponse(res, "Reset token sent to email");
     } catch (error) {
       user.resetPasswordToken = null;
       user.resetPasswordExpires = null;
       await user.save();
 
-      return res.status(500).json({
-        status: 'error',
-        message: 'Error sending email. Please try again later.'
-      });
+      return errorResponse(
+        res,
+        "Error sending email. Please try again later.",
+        500,
+      );
     }
   } catch (error) {
     next(error);
@@ -128,22 +175,19 @@ export const resetPassword = async (req, res, next) => {
 
     // Hash token
     const resetPasswordToken = crypto
-      .createHash('sha256')
+      .createHash("sha256")
       .update(token)
-      .digest('hex');
+      .digest("hex");
 
     const user = await User.findOne({
       where: {
         resetPasswordToken,
-        resetPasswordExpires: { [Op.gt]: Date.now() }
-      }
+        resetPasswordExpires: { [Op.gt]: Date.now() },
+      },
     });
 
     if (!user) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Token is invalid or has expired'
-      });
+      return errorResponse(res, "Token is invalid or has expired", 400);
     }
 
     // Update password
@@ -155,12 +199,9 @@ export const resetPassword = async (req, res, next) => {
     // Generate new token
     const newToken = generateToken(user.id);
 
-    res.json({
-      status: 'success',
-      data: {
-        user,
-        token: newToken
-      }
+    return successResponse(res, "Password reset successful", {
+      user,
+      token: newToken,
     });
   } catch (error) {
     next(error);
@@ -173,19 +214,13 @@ export const changePassword = async (req, res, next) => {
     const user = await User.findByPk(req.user.id);
 
     if (!(await user.comparePassword(currentPassword))) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Current password is incorrect'
-      });
+      return errorResponse(res, "Current password is incorrect", 401);
     }
 
     user.password = newPassword;
     await user.save();
 
-    res.json({
-      status: 'success',
-      message: 'Password updated successfully'
-    });
+    return successResponse(res, "Password updated successfully");
   } catch (error) {
     next(error);
   }

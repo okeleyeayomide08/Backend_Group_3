@@ -45,7 +45,7 @@ app.use(
 app.get("/", (req, res) => {
   res.json({
     status: "success",
-    message: "StockPilot API is running 🚀",
+    message: "Inventory API is running 🚀",
     version: "1.0.0",
     docs: `http://localhost:${process.env.PORT}/api-docs`,
   });
@@ -73,7 +73,7 @@ const startServer = async () => {
   try {
     await connectDB();
     app.listen(PORT, () => {
-      console.log(`🚀 StockPilot server running on port ${PORT}`);
+      console.log(`🚀 Inventory server running on port ${PORT}`);
       console.log(`📚 API Docs → http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {

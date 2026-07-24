@@ -7,10 +7,10 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "StockPilot API",
+      title: "Inventory API",
       version: "1.0.0",
       description: `
-        StockPilot - Inventory Management System for SMEs.
+        Inventory - Inventory Management System for SMEs.
         
         ## Roles & Permissions
         - **Owner/Admin** → Full access to everything
@@ -22,7 +22,7 @@ const options = {
         \`Authorization: Bearer your_token_here\`
       `,
       contact: {
-        name: "StockPilot Support",
+        name: "Inventory Support",
       },
     },
     servers: [
