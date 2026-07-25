@@ -8,7 +8,8 @@ const registerValidation = [
     .isLength({ min: 3, max: 50 })
     .withMessage("Full name must be between 3 and 50 characters"),
   body("storeName")
-    .optional()
+    .notEmpty()
+    .withMessage("Store name is required")
     .isLength({ min: 2 })
     .withMessage("Store name must be at least 2 characters"),
   body("phoneNumber")

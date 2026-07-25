@@ -7,6 +7,14 @@ const Product = sequelize.define("Product", {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
+  storeId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: "Stores",
+      key: "id",
+    },
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false,

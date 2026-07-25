@@ -7,6 +7,14 @@ const Sale = sequelize.define("Sale", {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
+  storeId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: "Stores",
+      key: "id",
+    },
+  },
   userId: {
     type: DataTypes.UUID,
     allowNull: false,

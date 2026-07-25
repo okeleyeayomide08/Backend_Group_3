@@ -7,6 +7,14 @@ const InventoryLog = sequelize.define("InventoryLog", {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
+  storeId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: "Stores",
+      key: "id",
+    },
+  },
   productId: {
     type: DataTypes.UUID,
     allowNull: false,

@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { Op } from "sequelize";
 import User from "../models/User.js";
+import { Store } from "../models/index.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 import {
   sendResetPasswordEmail,
@@ -9,8 +10,8 @@ import {
 } from "../services/emailService.js";
 import { validationResult } from "express-validator";
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+const generateToken = (id, storeId) => {
+  return jwt.sign({ id, storeId }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRATION,
   });
 };
@@ -34,19 +35,28 @@ export const register = async (req, res, next) => {
     // create user
     const user = await User.create({
       fullName,
-      storeName,
       phoneNumber,
       email,
       password,
     });
 
+    // create Store
+    const store = await Store.create({
+      name: storeName,
+      ownerId: user.id,
+    });
+
+    // update User
+    user.storeId = store.id;
+    await user.save();
+
     // generate token
-    const token = generateToken(user.id);
+    const token = generateToken(user.id, store.id);
 
     return successResponse(
       res,
       "Registration successful",
-      { user, token },
+      { user, store, token },
       201,
     );
   } catch (error) {
@@ -85,7 +95,7 @@ export const login = async (req, res, next) => {
     await user.save();
 
     // Generate token
-    const token = generateToken(user.id);
+    const token = generateToken(user.id, user.storeId);
 
     return successResponse(res, "Login Successful", {
       user,
@@ -105,6 +115,7 @@ export const createEmployee = async (req, res, next) => {
     }
 
     const { fullName, phoneNumber, email, password, role } = req.body;
+    const storeId = req.user.storeId;
 
     // check if email already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -119,6 +130,7 @@ export const createEmployee = async (req, res, next) => {
       email,
       password,
       role,
+      storeId,
     });
 
     // send email with credentials
@@ -209,7 +221,7 @@ export const resetPassword = async (req, res, next) => {
     await user.save();
 
     // Generate new token
-    const newToken = generateToken(user.id);
+    const newToken = generateToken(user.id, user.storeId);
 
     return successResponse(res, "Password reset successful", {
       user,

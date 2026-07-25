@@ -5,6 +5,7 @@ import Supplier from "./Supplier.js";
 import Sale from "./Sale.js";
 import SaleItem from "./SaleItem.js";
 import InventoryLog from "./InventoryLog.js";
+import Store from "./Store.js";
 
 // Category ↔ Product
 Category.hasMany(Product, { foreignKey: "categoryId" });
@@ -34,4 +35,37 @@ InventoryLog.belongsTo(Product, { foreignKey: "productId" });
 User.hasMany(InventoryLog, { foreignKey: "userId" });
 InventoryLog.belongsTo(User, { foreignKey: "userId" });
 
-export { User, Category, Product, Supplier, Sale, SaleItem, InventoryLog };
+// Store ↔ User
+Store.hasMany(User, { foreignKey: "storeId" });
+User.belongsTo(Store, { foreignKey: "storeId" });
+
+// Store ↔ Category
+Store.hasMany(Category, { foreignKey: "storeId" });
+Category.belongsTo(Store, { foreignKey: "storeId" });
+
+// Store ↔ Product
+Store.hasMany(Product, { foreignKey: "storeId" });
+Product.belongsTo(Store, { foreignKey: "storeId" });
+
+// Store ↔ Supplier
+Store.hasMany(Supplier, { foreignKey: "storeId" });
+Supplier.belongsTo(Store, { foreignKey: "storeId" });
+
+// Store ↔ Sale
+Store.hasMany(Sale, { foreignKey: "storeId" });
+Sale.belongsTo(Store, { foreignKey: "storeId" });
+
+// Store ↔ InventoryLog
+Store.hasMany(InventoryLog, { foreignKey: "storeId" });
+InventoryLog.belongsTo(Store, { foreignKey: "storeId" });
+
+export {
+  User,
+  Category,
+  Product,
+  Supplier,
+  Sale,
+  SaleItem,
+  InventoryLog,
+  Store,
+};

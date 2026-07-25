@@ -18,9 +18,13 @@ const User = sequelize.define(
         len: [3, 30],
       },
     },
-    storeName: {
-      type: DataTypes.STRING,
+    storeId: {
+      type: DataTypes.UUID,
       allowNull: true,
+      references: {
+        model: "Stores",
+        key: "id",
+      },
     },
     phoneNumber: {
       type: DataTypes.STRING,
