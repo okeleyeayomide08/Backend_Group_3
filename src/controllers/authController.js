@@ -23,7 +23,7 @@ export const register = async (req, res, next) => {
       return errorResponse(res, errors.array()[0].msg, 400);
     }
 
-    const { fullName, email, password } = req.body;
+    const { fullName, storeName, phoneNumber, email, password } = req.body;
 
     // check if email already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -32,7 +32,13 @@ export const register = async (req, res, next) => {
     }
 
     // create user
-    const user = await User.create({ fullName, email, password });
+    const user = await User.create({
+      fullName,
+      storeName,
+      phoneNumber,
+      email,
+      password,
+    });
 
     // generate token
     const token = generateToken(user.id);
@@ -98,7 +104,7 @@ export const createEmployee = async (req, res, next) => {
       return errorResponse(res, errors.array()[0].msg, 400);
     }
 
-    const { fullName, email, password, role } = req.body;
+    const { fullName, phoneNumber, email, password, role } = req.body;
 
     // check if email already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -107,7 +113,13 @@ export const createEmployee = async (req, res, next) => {
     }
 
     // create employee
-    const employee = await User.create({ fullName, email, password, role });
+    const employee = await User.create({
+      fullName,
+      phoneNumber,
+      email,
+      password,
+      role,
+    });
 
     // send email with credentials
     await sendEmployeeCredentialsEmail(email, fullName, password, role);

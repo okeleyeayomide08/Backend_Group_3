@@ -7,6 +7,15 @@ const registerValidation = [
     .withMessage("Full name is required")
     .isLength({ min: 3, max: 50 })
     .withMessage("Full name must be between 3 and 50 characters"),
+  body("storeName")
+    .optional()
+    .isLength({ min: 2 })
+    .withMessage("Store name must be at least 2 characters"),
+  body("phoneNumber")
+    .notEmpty()
+    .withMessage("Phone number is required")
+    .isLength({ min: 10, max: 15 })
+    .withMessage("Please enter a valid phone number"),
   body("email")
     .notEmpty()
     .withMessage("Email is required")
@@ -26,7 +35,8 @@ const loginValidation = [
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
-    .withMessage("Email must be a vaild email"),
+    .withMessage("Email must be a vaild email")
+    .normalizeEmail(),
   body("password").trim().notEmpty().withMessage("Password is required"),
 ];
 
@@ -37,6 +47,11 @@ const createEmployeeValidation = [
     .withMessage("Full name is required")
     .isLength({ min: 3, max: 50 })
     .withMessage("Full name must be between 3 and 50 characters"),
+  body("phoneNumber")
+    .notEmpty()
+    .withMessage("Phone number is required")
+    .isLength({ min: 10, max: 15 })
+    .withMessage("Please enter a valid phone number"),
   body("email")
     .notEmpty()
     .withMessage("Email is required")
