@@ -22,7 +22,7 @@ const Product = sequelize.define("Product", {
   sku: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: false,
   },
   categoryId: {
     type: DataTypes.UUID,
