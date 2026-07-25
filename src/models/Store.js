@@ -14,10 +14,6 @@ const Store = sequelize.define("Store", {
   ownerId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: {
-      model: "Users",
-      key: "id",
-    },
   },
 });
 
