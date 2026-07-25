@@ -32,6 +32,7 @@ export const protect = async (req, res, next) => {
         return errorResponse(res, "User account is deactivated", 401);
       }
 
+      user.storeId = decoded.storeId;
       req.user = user;
       next();
     } catch (error) {
