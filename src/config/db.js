@@ -34,7 +34,7 @@ export const connectDB = async () => {
     await import("../models/index.js");
 
     if (process.env.NODE_ENV === "development") {
-      await sequelize.sync({ alter: true });
+      await sequelize.sync({ alter: false });
       console.log("✅ Database synced successfully.");
     }
   } catch (error) {
