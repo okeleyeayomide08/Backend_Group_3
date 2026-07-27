@@ -71,11 +71,14 @@ app.use(
 
 // ─── Health Check ──────────────────────────────────────
 app.get("/", (req, res) => {
+  const host = req.get("host") || `localhost:${process.env.PORT || 5000}`;
+  const protocol = req.protocol;
+
   res.json({
     status: "success",
     message: "Eventory API is running",
     version: "1.0.0",
-    docs: `http://localhost:${process.env.PORT}/api-docs`,
+    docs: `${protocol}://${host}/api-docs`,
   });
 });
 
