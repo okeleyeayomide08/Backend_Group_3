@@ -11,6 +11,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import supplierRoutes from "./routes/supplierRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
+import salesRoutes from "./routes/salesRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
@@ -61,6 +62,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/suppliers", supplierRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/inventory", inventoryRoutes);
+app.use("/api/sales", salesRoutes);
 // More routes will be added here as we build them
 
 // ─── Handle Undefined Routes (404) ────────────────────
