@@ -58,7 +58,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/suppliers", supplierRoutes);
-app.use("api/products/",productRoutes);
+app.use("/api/products", productRoutes);
 // More routes will be added here as we build them
 
 // ─── Handle Undefined Routes (404) ────────────────────

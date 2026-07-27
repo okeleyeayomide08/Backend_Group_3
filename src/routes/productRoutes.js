@@ -1,12 +1,45 @@
 // productRoutes.js
-import express from 'express';
-const router = express.Router();
-import { createProductValidation, updateProductValidation } from '../validations/productValidation.js';
-import * as productController from '../controllers/productController.js';
-import role from '../middleware/roleMiddleware.js'; 
-import {protect, authorize} from '../middleware/authMiddleware.js';
+import express from "express";
+import {
+  createProductValidation,
+  updateProductValidation,
+} from "../validations/productValidation.js";
+import {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+} from "../controllers/productController.js";
+import { protect, authorize } from "../middleware/authMiddleware.js";
 
-router.post('/', authorize, role(['owner','admin','manager']),protect,authorize,createProductValidation, productController.create);
-router.put('/:id', authorize, role(['owner','admin','manager']), protect, authorize, updateProductValidation, productController.update);
+const router = express.Router();
+
+router.post(
+  "/",
+  protect,
+  authorize("owner", "admin", "manager"),
+  createProductValidation,
+  createProduct,
+);
+
+router.get("/", protect, getAllProducts);
+
+router.get("/:id", protect, getProductById);
+
+router.put(
+  "/:id",
+  protect,
+  authorize("owner", "admin", "manager"),
+  updateProductValidation,
+  updateProduct,
+);
+
+router.delete(
+  "/:id",
+  protect,
+  authorize("owner", "admin", "manager"),
+  deleteProduct,
+);
 
 export default router;

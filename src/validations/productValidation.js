@@ -39,45 +39,57 @@ const supplierValidation = [
     .withMessage("Address cannot exceed 200 characters"),
 ];
 
-
-export const createProductValidation = [
-  body('name')
+const createProductValidation = [
+  body("name").notEmpty().withMessage("Product name is required"),
+  body("categoryId").notEmpty().withMessage("CategoryId is required"),
+  body("supplierId").optional(),
+  body("unitPrice")
     .notEmpty()
-    .withMessage('Product name is required'),
-
-  body('unitPrice')
+    .withMessage("Unit price is required")
     .isFloat({ min: 0 })
-    .withMessage('Unit price must be non-negative'),
-
-  body('costPrice')
+    .withMessage("Unit price must be non-negative"),
+  body("costPrice")
+    .notEmpty()
+    .withMessage("Cost Price is required")
     .isFloat({ min: 0 })
-    .withMessage('Cost price must be non-negative'),
-
-  body('currentStock')
+    .withMessage("Cost price must be non-negative"),
+  body("currentStock")
+    .notEmpty()
+    .withMessage("Current stock is required")
     .isInt({ min: 0 })
-    .withMessage('Stock must be non-negative'),
-
-  body('reorderLevel')
+    .withMessage("Current stock must be non-negative"),
+  body("reorderLevel")
+    .notEmpty()
+    .withMessage("Reorder level is required")
     .isInt({ min: 0 })
-    .withMessage('Reorder level must be non-negative'),
+    .withMessage("Reorder level must be non-negative"),
 ];
 
-export const updateProductValidation = [
-  body('unitPrice')
+const updateProductValidation = [
+  body("name").optional(),
+  body("categoryId").optional(),
+  body("supplierId").optional(),
+  body("unitPrice")
     .optional()
     .isFloat({ min: 0 })
-    .withMessage('Unit price must be non-negative'),
-
-  body('costPrice')
+    .withMessage("Unit price must be non-negative"),
+  body("costPrice")
     .optional()
     .isFloat({ min: 0 })
-    .withMessage('Cost price must be non-negative'),
-
-  body('reorderLevel')
+    .withMessage("Cost price must be non-negative"),
+  body("currentStock")
     .optional()
     .isInt({ min: 0 })
-    .withMessage('Reorder level must be non-negative'),
+    .withMessage("Current stock must be non-negative"),
+  body("reorderLevel")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Reorder level must be non-negative"),
 ];
 
-
-export { categoryValidation, supplierValidation };
+export {
+  categoryValidation,
+  supplierValidation,
+  createProductValidation,
+  updateProductValidation,
+};
