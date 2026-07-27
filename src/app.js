@@ -73,7 +73,7 @@ app.use(
 app.get("/", (req, res) => {
   res.json({
     status: "success",
-    message: "Inventory API is running 🚀",
+    message: "Eventory API is running",
     version: "1.0.0",
     docs: `http://localhost:${process.env.PORT}/api-docs`,
   });
@@ -101,14 +101,14 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 // ─── Start Server ──────────────────────────────────────
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => {
-      console.log(`🚀 Inventory server running on port ${PORT}`);
-      console.log(`📚 API Docs → http://localhost:${PORT}/api-docs`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Enventory server running on port ${PORT}`);
+      console.log(`API Docs → http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error);
