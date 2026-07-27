@@ -14,7 +14,7 @@ export const sendResetPasswordEmail = async (email, token) => {
   const resetURL = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password/${token}`;
 
   const message = {
-    from: process.env.EMAIL_USER,
+    from: `"Eventory" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Password Reset Request",
     html: `
@@ -38,7 +38,7 @@ export const sendEmployeeCredentialsEmail = async (
   const loginURL = `${process.env.FRONTEND_URL || "http://localhost:3000"}/login`;
 
   const message = {
-    from: process.env.EMAIL_USER,
+    from: `"Eventory" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Welcome to the Team - Your Account Credentials",
     html: `

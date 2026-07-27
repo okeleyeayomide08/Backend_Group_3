@@ -1,55 +1,67 @@
 const errorHandler = (err, req, res, next) => {
   console.error(err);
 
+  // Rate limit error
+  if (err.status === 429) {
+    return res.status(429).json({
+      status: "error",
+      message: "Too many requests, please try again later",
+    });
+  }
+
   // Sequelize unique constraint error
-  if (err.name === 'SequelizeUniqueConstraintError') {
-    const field = err.errors[0].path;
+  if (err.name === "SequelizeUniqueConstraintError") {
+    const field = err.errors?.[0]?.path || "Field";
     return res.status(400).json({
-      status: 'error',
-      message: `${field} already exists`
+      status: "error",
+      message: `${field} already exists`,
     });
   }
 
   // Sequelize validation error
-  if (err.name === 'SequelizeValidationError') {
-    const errors = err.errors.map(e => ({
+  if (err.name === "SequelizeValidationError") {
+    const errors = err.errors.map((e) => ({
       field: e.path,
-      message: e.message
+      message: e.message,
     }));
+
     return res.status(400).json({
-      status: 'error',
-      message: 'Validation error',
-      errors
+      status: "error",
+      message: "Validation error",
+      errors,
     });
   }
 
   // JWT errors
-  if (err.name === 'JsonWebTokenError') {
+  if (err.name === "JsonWebTokenError") {
     return res.status(401).json({
-      status: 'error',
-      message: 'Invalid token'
+      status: "error",
+      message: "Invalid token",
     });
   }
 
-  if (err.name === 'TokenExpiredError') {
+  if (err.name === "TokenExpiredError") {
     return res.status(401).json({
-      status: 'error',
-      message: 'Token expired'
+      status: "error",
+      message: "Token expired",
     });
   }
 
   // Multer errors
-  if (err.code === 'LIMIT_FILE_SIZE') {
+  if (err.code === "LIMIT_FILE_SIZE") {
     return res.status(400).json({
-      status: 'error',
-      message: 'File size too large'
+      status: "error",
+      message: "File size too large",
     });
   }
 
-  // Default error if no other error code was found.
-  res.status(err.status || 500).json({
-    status: 'error',
-    message: err.message || 'Internal server error'
+  // Default fallback
+  return res.status(err.status || 500).json({
+    status: "error",
+    message:
+      process.env.NODE_ENV === "development"
+        ? err.message
+        : "Internal server error",
   });
 };
 

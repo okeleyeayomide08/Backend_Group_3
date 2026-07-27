@@ -31,6 +31,27 @@ app.use(
   }),
 );
 
+// ─── Rate Limiting ─────────────────────────────────────
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per 15 mins
+  message: {
+    status: "error",
+    message: "Too many requests, please try again later",
+  },
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // only 10 login attempts
+  message: {
+    status: "error",
+    message: "Too many login attempts, please try again later",
+  },
+});
+
+app.use(globalLimiter);
+
 // ─── Request Logging ───────────────────────────────────
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
