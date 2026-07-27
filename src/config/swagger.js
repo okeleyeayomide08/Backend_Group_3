@@ -31,7 +31,7 @@ const options = {
         description: "Development server",
       },
       {
-        url: `https://your-render-url.onrender.com/api`,
+        url: `https://backend-group-3.onrender.com`,
         description: "Production server",
       },
     ],
