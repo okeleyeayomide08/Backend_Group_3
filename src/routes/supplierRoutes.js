@@ -100,7 +100,7 @@ router.get("/:id", protect, getSupplierById);
 /**
  * @swagger
  * /suppliers/{id}:
- *   put:
+ *   patch:
  *     summary: Update a supplier
  *     tags: [Suppliers]
  *     security:
@@ -136,7 +136,7 @@ router.get("/:id", protect, getSupplierById);
  *       404:
  *         description: Supplier not found
  */
-router.put(
+router.patch(
   "/:id",
   protect,
   authorize("owner", "admin", "manager"),
