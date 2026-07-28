@@ -140,7 +140,7 @@ Swagger docs:
 | POST | /api/categories |
 | GET | /api/categories |
 | GET | /api/categories/:id |
-| PUT | /api/categories/:id |
+| PATCH | /api/categories/:id |
 | DELETE | /api/categories/:id |
 
 ---
@@ -152,7 +152,7 @@ Swagger docs:
 | POST | /api/suppliers |
 | GET | /api/suppliers |
 | GET | /api/suppliers/:id |
-| PUT | /api/suppliers/:id |
+| PATCH | /api/suppliers/:id |
 | DELETE | /api/suppliers/:id |
 
 ---
@@ -166,7 +166,7 @@ Supports pagination, search, filtering.
 | POST | /api/products |
 | GET | /api/products |
 | GET | /api/products/:id |
-| PUT | /api/products/:id |
+| PATCH | /api/products/:id |
 | DELETE | /api/products/:id |
 
 **Query Parameters:**
@@ -177,10 +177,10 @@ Supports pagination, search, filtering.
 ## 📊 Inventory
 
 ### Stock In
-`POST /api/inventory/stock-in`
+`POST /api/inventory/:productId/stock-in`
 
 ### Stock Out
-`POST /api/inventory/stock-out`
+`POST /api/inventory/:productId/stock-out`
 
 ### Get All Logs
 `GET /api/inventory/logs?page=1&limit=10`
