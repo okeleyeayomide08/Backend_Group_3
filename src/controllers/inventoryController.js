@@ -11,7 +11,8 @@ export const stockIn = async (req, res, next) => {
       return errorResponse(res, errors.array()[0].msg, 400);
     }
 
-    const { productId, quantity, reason } = req.body;
+    const { productId } = req.params;
+    const { quantity, reason } = req.body;
     const storeId = req.user.storeId;
     const userId = req.user.id;
 
@@ -28,7 +29,7 @@ export const stockIn = async (req, res, next) => {
     await product.save();
 
     const inventoryLog = await InventoryLog.create({
-      productId,
+      productId: product.id,
       userId,
       storeId,
       type: "IN",
@@ -64,7 +65,8 @@ export const stockOut = async (req, res, next) => {
       return errorResponse(res, errors.array()[0].msg, 400);
     }
 
-    const { productId, quantity, reason } = req.body;
+    const { productId } = req.params;
+    const { quantity, reason } = req.body;
     const storeId = req.user.storeId;
     const userId = req.user.id;
 
@@ -89,7 +91,7 @@ export const stockOut = async (req, res, next) => {
     await product.save();
 
     const inventoryLog = await InventoryLog.create({
-      productId,
+      productId: product.id,
       userId,
       storeId,
       type: "OUT",
