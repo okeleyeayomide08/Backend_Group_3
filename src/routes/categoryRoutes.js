@@ -94,7 +94,7 @@ router.get("/:id", protect, getCategoryById);
 /**
  * @swagger
  * /categories/{id}:
- *   put:
+ *   patch:
  *     summary: Update a category
  *     tags: [Categories]
  *     security:
@@ -124,7 +124,7 @@ router.get("/:id", protect, getCategoryById);
  *       404:
  *         description: Category not found
  */
-router.put(
+router.patch(
   "/:id",
   protect,
   authorize("owner", "admin", "manager"),
