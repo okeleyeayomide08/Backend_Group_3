@@ -141,18 +141,7 @@ export const updateProduct = async (req, res, next) => {
       return errorResponse(res, errors.array()[0].msg, 400);
     }
 
-    const id = req.params.id;
-
-    const {
-      name,
-      categoryId,
-      supplierId,
-      unitPrice,
-      costPrice,
-      currentStock,
-      reorderLevel,
-    } = req.body;
-
+    const { id } = req.params;
     const storeId = req.user.storeId;
 
     const product = await Product.findOne({
@@ -167,7 +156,18 @@ export const updateProduct = async (req, res, next) => {
       return errorResponse(res, "Product not found", 404);
     }
 
-    if (categoryId) {
+    const {
+      name,
+      categoryId,
+      supplierId,
+      unitPrice,
+      costPrice,
+      currentStock,
+      reorderLevel,
+    } = req.body;
+
+    // Validate Category only if provided in payload
+    if (categoryId !== undefined) {
       const existingCategory = await Category.findOne({
         where: {
           id: categoryId,
@@ -180,9 +180,11 @@ export const updateProduct = async (req, res, next) => {
       }
 
       product.sku = generateSKU(existingCategory.name);
+      product.categoryId = categoryId;
     }
 
-    if (supplierId) {
+    // Validate Supplier only if provided in payload
+    if (supplierId !== undefined) {
       const existingSupplier = await Supplier.findOne({
         where: {
           id: supplierId,
@@ -193,9 +195,12 @@ export const updateProduct = async (req, res, next) => {
       if (!existingSupplier) {
         return errorResponse(res, "Supplier not found", 404);
       }
+
+      product.supplierId = supplierId;
     }
 
-    if (name) {
+    // Check duplicate name only if name is actually being changed
+    if (name !== undefined && name !== product.name) {
       const existingProduct = await Product.findOne({
         where: {
           name,
@@ -206,15 +211,13 @@ export const updateProduct = async (req, res, next) => {
       if (existingProduct) {
         return errorResponse(res, "Product name already exists", 409);
       }
+      product.name = name;
     }
 
-    product.name = name || product.name;
-    product.categoryId = categoryId || product.categoryId;
-    product.supplierId = supplierId || product.supplierId;
-    product.unitPrice = unitPrice || product.unitPrice;
-    product.costPrice = costPrice || product.costPrice;
-    product.currentStock = currentStock ?? product.currentStock;
-    product.reorderLevel = reorderLevel ?? product.reorderLevel;
+    if (unitPrice !== undefined) product.unitPrice = unitPrice;
+    if (costPrice !== undefined) product.costPrice = costPrice;
+    if (currentStock !== undefined) product.currentStock = currentStock;
+    if (reorderLevel !== undefined) product.reorderLevel = reorderLevel;
 
     await product.save();
 
