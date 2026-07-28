@@ -90,22 +90,24 @@ const updateSupplier = async (req, res, next) => {
       return errorResponse(res, "Supplier not found", 404);
     }
 
-    const existingSupplier = await Supplier.findOne({
-      where: {
-        name,
-        storeId,
-        id: { [Op.ne]: id },
-      },
-    });
+    if (name) {
+      const existingSupplier = await Supplier.findOne({
+        where: {
+          name,
+          storeId,
+          id: { [Op.ne]: id },
+        },
+      });
 
-    if (existingSupplier) {
-      return errorResponse(res, "Supplier name already exists", 409);
+      if (existingSupplier) {
+        return errorResponse(res, "Supplier name already exists", 409);
+      }
     }
 
-    supplier.name = name || supplier.name;
-    supplier.contactPhone = contactPhone || supplier.contactPhone;
-    supplier.email = email || supplier.email;
-    supplier.address = address || supplier.address;
+    if (name !== undefined) supplier.name = name;
+    if (contactPhone !== undefined) supplier.contactPhone = contactPhone;
+    if (email !== undefined) supplier.email = email;
+    if (address !== undefined) supplier.address = address;
 
     await supplier.save();
 
@@ -114,6 +116,7 @@ const updateSupplier = async (req, res, next) => {
     next(error);
   }
 };
+                               
 
 const deleteSupplier = async (req, res, next) => {
   try {
