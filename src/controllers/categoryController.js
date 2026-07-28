@@ -70,7 +70,6 @@ const getCategoryById = async (req, res, next) => {
     next(error);
   }
 };
-
 const updateCategory = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -88,20 +87,22 @@ const updateCategory = async (req, res, next) => {
       return errorResponse(res, "Category not found", 404);
     }
 
-    const existingCategory = await Category.findOne({
-      where: {
-        name,
-        storeId,
-        id: { [Op.ne]: id },
-      },
-    });
+    if (name) {
+      const existingCategory = await Category.findOne({
+        where: {
+          name,
+          storeId,
+          id: { [Op.ne]: id },
+        },
+      });
 
-    if (existingCategory) {
-      return errorResponse(res, "Category name already exists", 409);
+      if (existingCategory) {
+        return errorResponse(res, "Category name already exists", 409);
+      }
     }
 
-    category.name = name || category.name;
-    category.description = description || category.description;
+    if (name !== undefined) category.name = name;
+    if (description !== undefined) category.description = description;
 
     await category.save();
 
