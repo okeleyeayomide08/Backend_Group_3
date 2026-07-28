@@ -23,12 +23,19 @@ const router = express.Router();
 
 /**
  * @swagger
- * /inventory/stock-in:
+ * /inventory/stock-in/{productId}:
  *   post:
  *     summary: Add stock to a product
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product to stock in
  *     requestBody:
  *       required: true
  *       content:
@@ -36,12 +43,8 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - productId
  *               - quantity
  *             properties:
- *               productId:
- *                 type: string
- *                 example: product-uuid
  *               quantity:
  *                 type: integer
  *                 example: 50
@@ -55,7 +58,7 @@ const router = express.Router();
  *         description: Product not found
  */
 router.post(
-  "/stock-in",
+  "/stock-in/:productId",
   protect,
   authorize("owner", "admin", "manager"),
   stockInValidation,
@@ -64,12 +67,19 @@ router.post(
 
 /**
  * @swagger
- * /inventory/stock-out:
+ * /inventory/stock-out/{productId}:
  *   post:
  *     summary: Remove stock from a product
  *     tags: [Inventory]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product to stock out
  *     requestBody:
  *       required: true
  *       content:
@@ -77,13 +87,9 @@ router.post(
  *           schema:
  *             type: object
  *             required:
- *               - productId
  *               - quantity
  *               - reason
  *             properties:
- *               productId:
- *                 type: string
- *                 example: product-uuid
  *               quantity:
  *                 type: integer
  *                 example: 10
@@ -99,7 +105,7 @@ router.post(
  *         description: Insufficient stock
  */
 router.post(
-  "/stock-out",
+  "/stock-out/:productId",
   protect,
   authorize("owner", "admin", "manager"),
   stockOutValidation,
