@@ -1,7 +1,7 @@
-import { body } from "express-validator";
+import { param, body } from "express-validator";
 
 const stockInValidation = [
-  body("productId").trim().notEmpty().withMessage("ProductId is required"),
+  param("productId").trim().notEmpty().withMessage("ProductId is required"),
   body("quantity")
     .notEmpty()
     .withMessage("Quantity is required")
@@ -11,7 +11,7 @@ const stockInValidation = [
 ];
 
 const stockOutValidation = [
-  body("productId").trim().notEmpty().withMessage("ProductId is required"),
+  param("productId").trim().notEmpty().withMessage("ProductId is required"),
   body("quantity")
     .notEmpty()
     .withMessage("Quantity is required")
