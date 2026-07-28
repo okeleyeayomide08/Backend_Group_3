@@ -140,7 +140,7 @@ router.get("/:id", protect, getProductById);
 /**
  * @swagger
  * /products/{id}:
- *   put:
+ *   patch:
  *     summary: Update a product
  *     tags: [Products]
  *     security:
@@ -185,7 +185,7 @@ router.get("/:id", protect, getProductById);
  *       404:
  *         description: Product not found
  */
-router.put(
+router.patch(
   "/:id",
   protect,
   authorize("owner", "admin", "manager"),
