@@ -279,3 +279,36 @@ export const getProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateProfile = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return errorResponse(res, errors.array()[0].msg, 400);
+    }
+
+    const { fullName, phoneNumber } = req.body;
+    const userId = req.user.id;
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return errorResponse(res, "User not found", 404);
+    }
+
+    user.fullName = fullName || user.fullName;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+
+    await user.save();
+
+    return successResponse(res, "Profile updated successfully", {
+      id: user.id,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

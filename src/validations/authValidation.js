@@ -87,10 +87,23 @@ const changePasswordValidation = [
     .withMessage("Please enter your current password"),
 ];
 
+const updateProfileValidation = [
+  body("fullName")
+    .optional()
+    .trim()
+    .isLength({ min: 3, max: 50 })
+    .withMessage("Full name must be between 3 and 50 characters"),
+  body("phoneNumber")
+    .optional()
+    .isLength({ min: 10, max: 15 })
+    .withMessage("Please enter a valid phone number"),
+];
+
 export {
   registerValidation,
   loginValidation,
   createEmployeeValidation,
   passwordValidation,
   changePasswordValidation,
+  updateProfileValidation,
 };

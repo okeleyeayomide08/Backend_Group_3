@@ -7,6 +7,7 @@ import {
   resetPassword,
   changePassword,
   getProfile,
+  updateProfile,
 } from "../controllers/authController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import {
@@ -15,6 +16,7 @@ import {
   createEmployeeValidation,
   passwordValidation,
   changePasswordValidation,
+  updateProfileValidation,
 } from "../validations/authValidation.js";
 
 const router = express.Router();
@@ -265,5 +267,32 @@ router.post(
  *         description: Not authorized
  */
 router.get("/profile", protect, getProfile);
+
+/**
+ * @swagger
+ * /auth/profile:
+ *   patch:
+ *     summary: Update own profile (fullName and phoneNumber)
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: John Updated
+ *               phoneNumber:
+ *                 type: string
+ *                 example: "08099999999"
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ */
+router.patch("/profile", protect, updateProfileValidation, updateProfile);
 
 export default router;
