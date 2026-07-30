@@ -3,6 +3,7 @@
 A multi-tenant Inventory Management System built with **Node.js, Express, Sequelize, and MySQL (TiDB Cloud)**.
 
 Supports:
+
 - ✅ Multi-store (multi-tenant) architecture
 - ✅ Role-based access control (Owner, Admin, Manager, Attendant)
 - ✅ Product & Category management
@@ -36,6 +37,7 @@ Supports:
 This system uses **single database multi-tenancy**.
 
 Each store has:
+
 - Its own users
 - Its own products
 - Its own suppliers
@@ -50,12 +52,12 @@ All queries are filtered by `req.user.storeId`. Stores never see each other’s 
 
 ## Roles
 
-| Role | Permissions |
-| --- | --- |
-| owner | Full access |
-| admin | Full access except store ownership |
-| manager | Manage products, categories, suppliers, inventory |
-| attendant | Record sales only |
+| Role      | Permissions                                       |
+| --------- | ------------------------------------------------- |
+| owner     | Full access                                       |
+| admin     | Full access except store ownership                |
+| manager   | Manage products, categories, suppliers, inventory |
+| attendant | Record sales only                                 |
 
 ---
 
@@ -103,6 +105,7 @@ Swagger docs:
 ## 🔐 Authentication
 
 ### Register Owner
+
 `POST /api/auth/register`
 
 ```json
@@ -116,43 +119,52 @@ Swagger docs:
 ```
 
 ### Login
+
 `POST /api/auth/login`
 
 ### Create Employee
+
 `POST /api/auth/create-employee`  
-*Roles allowed:* owner, admin
+_Roles allowed:_ owner, admin
 
 ### Forgot Password
+
 `POST /api/auth/forgot-password`
 
 ### Reset Password
+
 `POST /api/auth/reset-password/:token`
 
 ### Change Password
+
 `POST /api/auth/change-password`
+
+### Get Profile
+
+`GET /api/auth/profile`
 
 ---
 
 ## 📂 Categories
 
-| Method | Endpoint |
-| --- | --- |
-| POST | /api/categories |
-| GET | /api/categories |
-| GET | /api/categories/:id |
-| PATCH | /api/categories/:id |
+| Method | Endpoint            |
+| ------ | ------------------- |
+| POST   | /api/categories     |
+| GET    | /api/categories     |
+| GET    | /api/categories/:id |
+| PATCH  | /api/categories/:id |
 | DELETE | /api/categories/:id |
 
 ---
 
 ## 🏢 Suppliers
 
-| Method | Endpoint |
-| --- | --- |
-| POST | /api/suppliers |
-| GET | /api/suppliers |
-| GET | /api/suppliers/:id |
-| PATCH | /api/suppliers/:id |
+| Method | Endpoint           |
+| ------ | ------------------ |
+| POST   | /api/suppliers     |
+| GET    | /api/suppliers     |
+| GET    | /api/suppliers/:id |
+| PATCH  | /api/suppliers/:id |
 | DELETE | /api/suppliers/:id |
 
 ---
@@ -161,12 +173,12 @@ Swagger docs:
 
 Supports pagination, search, filtering.
 
-| Method | Endpoint |
-| --- | --- |
-| POST | /api/products |
-| GET | /api/products |
-| GET | /api/products/:id |
-| PATCH | /api/products/:id |
+| Method | Endpoint          |
+| ------ | ----------------- |
+| POST   | /api/products     |
+| GET    | /api/products     |
+| GET    | /api/products/:id |
+| PATCH  | /api/products/:id |
 | DELETE | /api/products/:id |
 
 **Query Parameters:**
@@ -177,18 +189,23 @@ Supports pagination, search, filtering.
 ## 📊 Inventory
 
 ### Stock In
+
 `POST /api/inventory/:productId/stock-in`
 
 ### Stock Out
+
 `POST /api/inventory/:productId/stock-out`
 
 ### Get All Logs
+
 `GET /api/inventory/logs?page=1&limit=10`
 
 ### Get Product Logs
+
 `GET /api/inventory/logs/:productId?page=1&limit=10`
 
 ### Low Stock
+
 `GET /api/inventory/low-stock`
 
 ---
@@ -196,6 +213,7 @@ Supports pagination, search, filtering.
 ## 💰 Sales
 
 ### Record Sale (Atomic Transaction)
+
 `POST /api/sales`
 
 ```json
@@ -211,6 +229,7 @@ Supports pagination, search, filtering.
 ```
 
 This will:
+
 - ✅ Verify stock
 - ✅ Create sale
 - ✅ Create sale items
@@ -219,9 +238,11 @@ This will:
 - ✅ Return low stock warnings if needed
 
 ### Get All Sales
+
 `GET /api/sales?page=1&limit=10`
 
 ### Get Single Sale
+
 `GET /api/sales/:id`
 
 ---
@@ -229,9 +250,11 @@ This will:
 ## 📈 Reports
 
 ### Dashboard Summary
+
 `GET /api/dashboard/summary`
 
 Returns:
+
 - Total products
 - Total inventory value
 - Today's sales count
@@ -239,15 +262,26 @@ Returns:
 - Low stock count
 
 ### Sales Report
+
 `GET /api/reports/sales?period=daily&page=1&limit=10`
 
 Periods:
+
 - daily
 - weekly
 - monthly
 
 ### Best Sellers
+
 `GET /api/reports/best-sellers?limit=10`
+
+### Sales by Category
+
+`GET /api/reports/sales-by-category`
+
+### Monthly sales
+
+`GET /api/reports/monthly-sales`
 
 ---
 

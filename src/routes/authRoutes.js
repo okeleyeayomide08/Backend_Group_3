@@ -6,6 +6,7 @@ import {
   forgotPassword,
   resetPassword,
   changePassword,
+  getProfile,
 } from "../controllers/authController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 import {
@@ -248,5 +249,21 @@ router.post(
   changePasswordValidation,
   changePassword,
 );
+
+/**
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     summary: Get current user profile with store name
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully
+ *       401:
+ *         description: Not authorized
+ */
+router.get("/profile", protect, getProfile);
 
 export default router;

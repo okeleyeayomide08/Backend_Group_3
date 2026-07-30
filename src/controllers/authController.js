@@ -249,3 +249,33 @@ export const changePassword = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const storeId = req.user.storeId;
+
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return errorResponse(res, "User not found", 404);
+    }
+
+    const store = await Store.findOne({
+      where: { id: storeId },
+    });
+
+    return successResponse(res, "Profile retrieved", {
+      id: user.id,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      role: user.role,
+      storeName: store ? store.name : null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

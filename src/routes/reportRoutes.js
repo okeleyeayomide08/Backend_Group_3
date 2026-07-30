@@ -4,6 +4,8 @@ import {
   getDashboardSummary,
   getSalesReport,
   getBestSellers,
+  getSalesByCategory,
+  getMonthlySales,
 } from "../controllers/reportController.js";
 
 const router = express.Router();
@@ -79,5 +81,33 @@ router.get("/reports/sales", protect, getSalesReport);
  *         description: Best sellers retrieved successfully
  */
 router.get("/reports/best-sellers", protect, getBestSellers);
+
+/**
+ * @swagger
+ * /reports/sales-by-category:
+ *   get:
+ *     summary: Get total sales grouped by category (for chart)
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Sales by category retrieved
+ */
+router.get("/reports/sales-by-category", protect, getSalesByCategory);
+
+/**
+ * @swagger
+ * /reports/monthly-sales:
+ *   get:
+ *     summary: Get total sales per month (for chart)
+ *     tags: [Reports]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Monthly sales retrieved
+ */
+router.get("/reports/monthly-sales", protect, getMonthlySales);
 
 export default router;

@@ -199,3 +199,87 @@ export const getBestSellers = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getSalesByCategory = async (req, res, next) => {
+  try {
+    const storeId = req.user.storeId;
+
+    const salesByCategory = await SaleItem.findAll({
+      attributes: [
+        [
+          sequelize.fn("SUM", sequelize.col("SaleItem.quantity")),
+          "totalQuantitySold",
+        ],
+        [
+          sequelize.fn(
+            "SUM",
+            sequelize.literal("SaleItem.quantity * SaleItem.unitPrice"),
+          ),
+          "totalRevenue",
+        ],
+      ],
+      include: [
+        {
+          model: Product,
+          attributes: [],
+          where: { storeId },
+          include: [
+            {
+              model: Category,
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+      ],
+      group: ["Product.Category.id", "Product.Category.name"],
+      order: [[sequelize.literal("totalRevenue"), "DESC"]],
+      raw: true,
+      nest: true,
+    });
+
+    const formatted = salesByCategory.map((item) => ({
+      categoryName: item.Product?.Category?.name || "Unknown",
+      totalQuantitySold: parseInt(item.totalQuantitySold) || 0,
+      totalRevenue: parseFloat(item.totalRevenue) || 0,
+    }));
+
+    return successResponse(res, "Sales by category retrieved", {
+      salesByCategory: formatted,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMonthlySales = async (req, res, next) => {
+  try {
+    const storeId = req.user.storeId;
+
+    const monthlySales = await Sale.findAll({
+      attributes: [
+        [
+          sequelize.fn("DATE_FORMAT", sequelize.col("createdAt"), "%Y-%m"),
+          "month",
+        ],
+        [sequelize.fn("COUNT", sequelize.col("Sale.id")), "totalSales"],
+        [sequelize.fn("SUM", sequelize.col("totalAmount")), "totalRevenue"],
+      ],
+      where: { storeId },
+      group: [sequelize.fn("DATE_FORMAT", sequelize.col("createdAt"), "%Y-%m")],
+      order: [[sequelize.literal("month"), "ASC"]],
+      raw: true,
+    });
+
+    const formatted = monthlySales.map((item) => ({
+      month: item.month,
+      totalSales: parseInt(item.totalSales) || 0,
+      totalRevenue: parseFloat(item.totalRevenue) || 0,
+    }));
+
+    return successResponse(res, "Monthly sales retrieved", {
+      monthlySales: formatted,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
