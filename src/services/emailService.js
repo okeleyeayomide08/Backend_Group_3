@@ -35,7 +35,7 @@ export const sendEmployeeCredentialsEmail = async (
   password,
   role,
 ) => {
-  const loginURL = `${process.env.FRONTEND_URL || "http://localhost:3000"}/login`;
+  const loginURL = `${process.env.FRONTEND_URL || "http://localhost:3000"}loginPage.html`;
 
   const message = {
     from: `"Eventory" <${process.env.EMAIL_USER}>`,
